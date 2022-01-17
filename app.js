@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const { celebrate, Joi } = require('celebrate');
 
+const { NotFoundError } = require('./utils/custom_errors/NotFoundError');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const { PORT = 3000 } = process.env;
@@ -17,7 +18,14 @@ mongoose.connect('mongodb://localhost:27017/bitfilmsdb', {
 });
 app.use(requestLogger);
 
+app.use('/', require('./routes/users'));
+app.use('/', require('./routes/movies'));
+
 app.use(errorLogger);
+
+app.use((req, res, next) => {
+  next(new NotFoundError('Маршрут не найден'));
+});
 
 app.listen(PORT, () => {
 });
