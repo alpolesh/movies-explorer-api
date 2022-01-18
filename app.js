@@ -1,6 +1,10 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const { celebrate, Joi } = require('celebrate');
+const { errors } = require('celebrate');
+const { defaultError } = require('./utils/constants');
+const { createUser, login } = require('./controllers/users');
+const auth = require('./middlewares/auth');
 
 const { NotFoundError } = require('./utils/custom_errors/NotFoundError');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
@@ -18,13 +22,42 @@ mongoose.connect('mongodb://localhost:27017/bitfilmsdb', {
 });
 app.use(requestLogger);
 
-app.use('/', require('./routes/users'));
-app.use('/', require('./routes/movies'));
+app.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required(),
+  }),
+}), login);
+app.post('/signup', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(5),
+    name: Joi.string().min(2).max(30),
+  }),
+}), createUser);
+
+app.use('/', auth, require('./routes/users'));
+app.use('/', auth, require('./routes/movies'));
 
 app.use(errorLogger);
 
 app.use((req, res, next) => {
   next(new NotFoundError('Маршрут не найден'));
+});
+
+app.use(errors());
+
+app.use((err, req, res, next) => {
+  const { statusCode = defaultError.statusCode, message } = err;
+
+  res
+    .status(statusCode)
+    .send({
+      message: statusCode === 500
+        ? defaultError.message
+        : message,
+    });
+  next();
 });
 
 app.listen(PORT, () => {

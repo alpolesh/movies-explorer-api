@@ -1,5 +1,6 @@
 const Movie = require('../models/movie');
 const { NonExistendError } = require('../utils/custom_errors/NonExistendError');
+const { RightsError } = require('../utils/custom_errors/RightsError');
 const { ValidationError } = require('../utils/custom_errors/ValidationError');
 const { CastError } = require('../utils/custom_errors/CastError');
 
@@ -8,6 +9,7 @@ module.exports.createMovie = (req, res, next) => {
     country, director, duration, year, description, image,
     trailer, nameRU, nameEN, thumbnail, movieId,
   } = req.body;
+
   const owner = req.user._id;
   Movie.create({
     country,
@@ -46,12 +48,17 @@ module.exports.getAllMoviesByCurrentUser = (req, res, next) => {
 
 module.exports.deleteMovie = (req, res, next) => {
   const { movieId } = req.body;
-  Movie.findByIdAndRemove(movieId)
-    .then((movieForRemove) => {
-      if (movieForRemove === null) {
+  const userId = req.user._id;
+  Movie.findOne({ movieId })
+    .then((movie) => {
+      if (movie === null) {
         return Promise.reject(new NonExistendError('Фильм не найден'));
       }
-      return res.send({ data: movieForRemove });
+      if (userId !== movie.owner.toString()) {
+        return Promise.reject(new RightsError('Невозможно удалить фильм другого пользователя'));
+      }
+      return Movie.findOneAndRemove(movieId)
+        .then((movieForRemove) => res.send({ data: movieForRemove }));
     })
     .catch((err) => {
       if (err.name === 'CastError') {
