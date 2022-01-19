@@ -47,9 +47,9 @@ module.exports.getAllMoviesByCurrentUser = (req, res, next) => {
 };
 
 module.exports.deleteMovie = (req, res, next) => {
-  const { movieId } = req.body;
+  const { movieId } = req.params;
   const userId = req.user._id;
-  Movie.findOne({ movieId })
+  Movie.findById(movieId)
     .then((movie) => {
       if (movie === null) {
         return Promise.reject(new NonExistendError('Фильм не найден'));
@@ -57,7 +57,7 @@ module.exports.deleteMovie = (req, res, next) => {
       if (userId !== movie.owner.toString()) {
         return Promise.reject(new RightsError('Невозможно удалить фильм другого пользователя'));
       }
-      return Movie.findOneAndRemove(movieId)
+      return Movie.findByIdAndRemove(movieId)
         .then((movieForRemove) => res.send({ data: movieForRemove }));
     })
     .catch((err) => {

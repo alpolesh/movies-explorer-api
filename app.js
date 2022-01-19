@@ -2,9 +2,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const { celebrate, Joi } = require('celebrate');
 const { errors } = require('celebrate');
-const { defaultError } = require('./utils/constants');
 const { createUser, login } = require('./controllers/users');
 const auth = require('./middlewares/auth');
+const centralizedErrorHandler = require('./middlewares/centralizedErrorHandler');
 
 const { NotFoundError } = require('./utils/custom_errors/NotFoundError');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
@@ -16,7 +16,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-mongoose.connect('mongodb://localhost:27017/bitfilmsdb', {
+mongoose.connect('mongodb://localhost:27017/moviesdb', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
@@ -47,18 +47,7 @@ app.use((req, res, next) => {
 
 app.use(errors());
 
-app.use((err, req, res, next) => {
-  const { statusCode = defaultError.statusCode, message } = err;
-
-  res
-    .status(statusCode)
-    .send({
-      message: statusCode === 500
-        ? defaultError.message
-        : message,
-    });
-  next();
-});
+app.use(centralizedErrorHandler);
 
 app.listen(PORT, () => {
 });
