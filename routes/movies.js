@@ -4,8 +4,8 @@ const {
   getAllMoviesByCurrentUser, createMovie, deleteMovie,
 } = require('../controllers/movies');
 
-router.get('/movies', getAllMoviesByCurrentUser);
-router.post('/movies', celebrate({
+router.get('/', getAllMoviesByCurrentUser);
+router.post('/', celebrate({
   body: Joi.object().keys({
     country: Joi.string().required(),
     director: Joi.string().required(),
@@ -20,7 +20,7 @@ router.post('/movies', celebrate({
     movieId: Joi.number().required(),
   }),
 }), createMovie);
-router.delete('/movies/:movieId', celebrate({
+router.delete('/:movieId', celebrate({
   params: Joi.object().keys({
     movieId: Joi.string().length(24).hex(),
   }),

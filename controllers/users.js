@@ -6,6 +6,7 @@ const { ValidationError } = require('../utils/custom_errors/ValidationError');
 const { CastError } = require('../utils/custom_errors/CastError');
 const { AuthError } = require('../utils/custom_errors/AuthError');
 const { ExistendEmailError } = require('../utils/custom_errors/ExistendEmailError');
+const { jwtDevKey } = require('../utils/config');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
@@ -44,6 +45,8 @@ module.exports.updateUserProfil = (req, res, next) => {
         next(new ValidationError('Переданы некорректные данные в методы создания пользователя'));
       } else if (err.name === 'CastError') {
         next(new CastError('Переданы некорректные данные'));
+      } else if (err.code === 11000) {
+        next(new ExistendEmailError('Пользователь с такой почтой уже существует'));
       } else {
         next(err);
       }
@@ -86,8 +89,7 @@ module.exports.login = (req, res, next) => {
           if (!matched) {
             return Promise.reject(new AuthError('Неправильные почта или пароль'));
           }
-          const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret');
-          // res.cookie('token', token, { maxAge: 3600000 * 24 * 7, httpOnly: true });
+          const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : jwtDevKey);
           return res.send({
             message: 'аутентификация прошла успешно',
             data: {
