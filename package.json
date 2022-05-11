@@ -1,0 +1,43 @@
+{
+  "name": "movies-explorer-api",
+  "version": "1.0.0",
+  "description": "`/routes` — папка с файлами роутера  \r `/controllers` — папка с файлами контроллеров пользователя и карточки   \r `/models` — папка с файлами описания схем пользователя и карточки",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "npx eslint .",
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alpolesh/movies-explorer-api.git"
+  },
+  "author": "Andrey Poleshchuck",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alpolesh/movies-explorer-api/issues"
+  },
+  "homepage": "https://github.com/alpolesh/movies-explorer-api#readme",
+  "devDependencies": {
+    "eslint": "^8.2.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.25.3",
+    "nodemon": "^2.0.15"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "celebrate": "^15.0.0",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "express-winston": "^4.2.0",
+    "helmet": "^5.0.2",
+    "joi": "^17.4.2",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.0.12",
+    "validator": "^13.7.0",
+    "winston": "^3.3.3"
+  }
+}
