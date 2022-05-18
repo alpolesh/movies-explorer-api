@@ -24,11 +24,10 @@ module.exports.getCurrentUser = (req, res, next) => {
 };
 
 module.exports.updateUserProfil = (req, res, next) => {
-  const { name, email } = req.body;
   const userId = req.user._id;
   User.findByIdAndUpdate(
     userId,
-    { name, email },
+    req.body,
     {
       new: true,
       runValidators: true,
